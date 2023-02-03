@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mag250 Voice</title>
   </head>
-  <body style="background-color: black">
+  <body style="background-color: black; color: white">
     <script>
       const mapping = {
         первый: '1',
@@ -30,8 +30,13 @@
         ноль: '0',
       }
 
+      const log = text =>
+        (document.body.innerHTML = (
+          `<p>${text}</p>` + document.body.innerHTML
+        ).slice(0, 2048))
       let ws = new WebSocket('ws://' + location.host.replace('9300', '9301'))
       ws.onclose = () => location.reload()
+      log('Запущен')
 
       const SpeechRecognition =
         window.SpeechRecognition || window.webkitSpeechRecognition
@@ -51,11 +56,12 @@
         for (const key of Object.keys(mapping))
           transcript = transcript.replaceAll(key, mapping[key])
 
-        console.log(transcript)
+        log('Распознано: ' + transcript)
         ws.send(transcript)
       }
       recognition.start()
       recognition.onend = recognition.start
+      setInterval(recognition.start, 10000)
     </script>
   </body>
 </html>
