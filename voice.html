@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mag250 Voice</title>
+  </head>
+  <body style="background-color: black">
+    <script>
+      const mapping = {
+        первый: '1',
+        второй: '2',
+        третий: '3',
+        четвертый: '4',
+        пятый: '5',
+        шестой: '6',
+        седьмой: '7',
+        восьмой: '8',
+        девятый: '9',
+        десятый: '10',
+        один: '1',
+        два: '2',
+        три: '3',
+        четыре: '4',
+        пять: '5',
+        шесть: '6',
+        семь: '7',
+        восемь: '8',
+        девять: '9',
+        ноль: '0',
+      }
+
+      let ws = new WebSocket('ws://' + location.host.replace('9300', '9301'))
+      ws.onclose = () => location.reload()
+
+      const SpeechRecognition =
+        window.SpeechRecognition || window.webkitSpeechRecognition
+      const recognition = new SpeechRecognition()
+      recognition.continuous = true
+      recognition.lang = 'ru-RU'
+      recognition.onresult = event => {
+        const last = event.results.length - 1
+        let transcript = event.results[last][0].transcript
+        transcript = transcript
+          .replace(/[^\u0400-\u04FF\s\d]/g, '')
+          .trim()
+          .toLowerCase()
+        while (transcript.includes('  '))
+          transcript = transcript.replaceAll('  ', ' ')
+
+        for (const key of Object.keys(mapping))
+          transcript = transcript.replaceAll(key, mapping[key])
+
+        console.log(transcript)
+        ws.send(transcript)
+      }
+      recognition.start()
+      recognition.onend = recognition.start
+    </script>
+  </body>
+</html>
