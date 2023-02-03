@@ -61,7 +61,7 @@
       }
       recognition.start()
       recognition.onend = recognition.start
-      setInterval(recognition.start, 10000)
+      setInterval(() => recognition.start(), 10000)
     </script>
   </body>
 </html>
